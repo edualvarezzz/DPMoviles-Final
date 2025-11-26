@@ -8,6 +8,4 @@ class Estudiante(Base):
     nombre_completo = Column(String(250), nullable=False)
     carnet = Column(String(10), nullable=False)
     carrera = Column(String(200), nullable=False)
-    usuario = Column(String(200), nullable=False, unique=True)
-    password = Column(String(200), nullable=False)
     qr_asistencia = Column(Text, nullable=True)

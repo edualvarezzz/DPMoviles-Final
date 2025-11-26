@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from database import SessionLocal
 from models.estudiante import Estudiante
 from pydantic import BaseModel
-from utils.hash import hash_password
 from utils.qr_generator import generar_qr
 
 router = APIRouter(prefix="/estudiantes", tags=["Estudiantes"])
@@ -12,8 +11,6 @@ class EstudianteData(BaseModel):
     nombre_completo: str
     carnet: str
     carrera: str
-    usuario: str
-    password: str
 
 def get_db():
     db = SessionLocal()
@@ -25,10 +22,6 @@ def get_db():
 @router.post("/")
 def crear_estudiante(data: EstudianteData, db: Session = Depends(get_db)):
 
-    existe = db.query(Estudiante).filter(Estudiante.usuario == data.usuario).first()
-    if existe:
-        raise HTTPException(status_code=400, detail="El usuario ya existe")
-
     qr_text = f"{data.nombre_completo} | {data.carnet} | {data.carrera}"
     qr_path = generar_qr(qr_text)
 
@@ -36,8 +29,6 @@ def crear_estudiante(data: EstudianteData, db: Session = Depends(get_db)):
         nombre_completo=data.nombre_completo,
         carnet=data.carnet,
         carrera=data.carrera,
-        usuario=data.usuario,
-        password=hash_password(data.password),
         qr_asistencia=qr_path
     )
     db.add(nuevo)
@@ -61,8 +52,6 @@ def actualizar_estudiante(id: int, data: EstudianteData, db: Session = Depends(g
     estudiante.nombre_completo = data.nombre_completo
     estudiante.carnet = data.carnet
     estudiante.carrera = data.carrera
-    estudiante.usuario = data.usuario
-    estudiante.password = hash_password(data.password)
     estudiante.qr_asistencia = qr_path
 
     db.commit()
@@ -73,7 +62,6 @@ def actualizar_estudiante(id: int, data: EstudianteData, db: Session = Depends(g
         "nombre_completo": estudiante.nombre_completo,
         "carnet": estudiante.carnet,
         "carrera": estudiante.carrera,
-        "usuario": estudiante.usuario,
         "qr_asistencia": estudiante.qr_asistencia
     }
 
