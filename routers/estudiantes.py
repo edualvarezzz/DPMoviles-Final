@@ -58,7 +58,7 @@ def actualizar_estudiante(id: int, data: EstudianteData, db: Session = Depends(g
     db.refresh(estudiante)
 
     return {
-        "id": estudiante.estudiante_id,
+        "estudiante_id": estudiante.estudiante_id,
         "nombre_completo": estudiante.nombre_completo,
         "carnet": estudiante.carnet,
         "carrera": estudiante.carrera,
